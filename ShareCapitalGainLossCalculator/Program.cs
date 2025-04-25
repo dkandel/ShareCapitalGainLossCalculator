@@ -1,3 +1,5 @@
+using ShareCapitalGainLossCalculator.Services;
+
 namespace ShareCapitalGainLossCalculator;
 
 public class Program
@@ -10,6 +12,8 @@ public class Program
         builder.Services.AddRazorPages();
         builder.Services.AddControllers();
         builder.Services.AddSwaggerGen();
+
+        builder.Services.AddTransient<ICapitalGainLossCalculatorService, CapitalGainLossCalculatorService>();
 
         var app = builder.Build();
 
