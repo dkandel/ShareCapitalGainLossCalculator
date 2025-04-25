@@ -7,9 +7,10 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ShareCapitalGainLossCalculator.csproj .
-RUN dotnet restore "ShareCapitalGainLossCalculator.csproj"
-COPY . .
+COPY ShareCapitalGainLossCalculator/ShareCapitalGainLossCalculator.csproj ShareCapitalGainLossCalculator/
+RUN dotnet restore "ShareCapitalGainLossCalculator/ShareCapitalGainLossCalculator.csproj"
+COPY ShareCapitalGainLossCalculator/ ShareCapitalGainLossCalculator/
+WORKDIR /src/ShareCapitalGainLossCalculator
 RUN dotnet build "ShareCapitalGainLossCalculator.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
