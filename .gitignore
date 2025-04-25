@@ -1,0 +1,63 @@
+# .NET Core build results
+bin/
+obj/
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Logs
+*.log
+logs/
+
+# Visual Studio Code
+.vscode/
+
+# Rider
+.idea/
+
+# ASP.NET Scaffolding
+ScaffoldingReadMe.txt
+
+# DotNetCliTool
+*.dotnetcli
+
+# NuGet
+*.nupkg
+packages/
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# Environment variables
+.env
+
+# MacOS files
+.DS_Store
+
+# Windows image file caches
+Thumbs.db
+ehthumbs.db
+
+# Files built by Visual Studio
+*.dbmdl
+*.pfx
+*.publishsettings
+
+# Resharper
+_ReSharper.Caches/
+
+# JetBrains Rider
+.idea/
+*.sln.iml
+
+# Coverage
+coverage/
+*.coverage
+*.coveragexml
+*.codecov
+
+# Others
+*.vs/
