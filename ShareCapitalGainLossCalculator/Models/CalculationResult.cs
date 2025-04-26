@@ -6,18 +6,13 @@ namespace ShareCapitalGainLossCalculator.Models;
 /// </summary>
 public class CalculationResult
 {
+    public string Code { get; set; }
     // The total amount of gains from transactions
-    public double Gains { get; set; }
+    public decimal Gains { get; set; }
 
     // The total amount of losses from transactions
-    public double Losses { get; set; }
-
-    // The net gain after subtracting losses from gains (if positive)
-    public double NetGain { get; set; }
-
-    // The net loss after subtracting gains from losses (if positive)
-    public double NetLoss { get; set; }
+    public decimal Losses { get; set; }
 
     // Indicates whether the result is a net gain (true if NetGain > 0)
-    public bool IsGain { get; set; }
+    public decimal IsGain { get; set; }
 }

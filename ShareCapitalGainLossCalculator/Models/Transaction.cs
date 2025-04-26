@@ -1,5 +1,3 @@
-using CsvHelper.Configuration;
-
 namespace ShareCapitalGainLossCalculator.Models;
 
 /// <summary>
@@ -19,7 +17,7 @@ public class Transaction
     public DateTime Date { get; set; }
 
     // Type of transaction (BUY or SELL)
-    public string Type { get; set; }
+    public TransactionType Type { get; set; }
 
     // Number of shares bought or sold
     public int Quantity { get; set; }
@@ -41,22 +39,4 @@ public class Transaction
 
     // Total value of the transaction, including brokerage
     public decimal TotalValue { get; set; }
-}
-
-public class TransactionMap : ClassMap<Transaction>
-{
-    public TransactionMap()
-    {
-        Map(m => m.Code).Name("Code");
-        Map(m => m.Company).Name("Company");
-        Map(m => m.Date).Name("Date").TypeConverterOption.Format("dd/MM/yyyy"); // Parse date in dd/MM/yyyy format
-        Map(m => m.Type).Name("Type");
-        Map(m => m.Quantity).Name("Quantity");
-        Map(m => m.UnitPrice).Name("Unit Price ($)");
-        Map(m => m.TradeValue).Name("Trade Value ($)");
-        Map(m => m.BrokerageWithGst).Name("Brokerage+GST ($)");
-        Map(m => m.Gst).Name("GST ($)");
-        Map(m => m.ContractNote).Name("Contract Note");
-        Map(m => m.TotalValue).Name("Total Value ($)");
-    }
 }

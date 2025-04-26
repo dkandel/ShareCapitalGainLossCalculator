@@ -17,14 +17,15 @@ public class CalculatorsController: ControllerBase
     }
 
     [HttpPost("shares/capital-gain-loss")]
-    public async Task<IActionResult> CalculateGainOrLoss(IFormFile file)
+    public async Task<IActionResult> CalculateGainOrLoss(List<IFormFile> files)
     {
-        var validationResult = file.Validate();
-        if (!validationResult.IsValid)
+        var validationResult = files.Select(x=>x.Validate()).ToList();
+        if (validationResult.Any(x=>!x.IsValid))
         {
-            return BadRequest(validationResult.ErrorMessage);
+            var errors = validationResult.Where(x=>!x.IsValid).Select(x=>x.ErrorMessage).ToList();
+            return BadRequest(string.Join(",", errors));
         }
 
-        return Ok(await _capitalGainLossCalculatorService.CalculateCapitalGainLossAsync(file));
+        return Ok(await _capitalGainLossCalculatorService.CalculateCapitalGainLossAsync(files));
     }
 }

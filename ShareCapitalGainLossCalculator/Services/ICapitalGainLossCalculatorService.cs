@@ -4,5 +4,5 @@ namespace ShareCapitalGainLossCalculator.Services;
 
 public interface ICapitalGainLossCalculatorService
 {
-    Task<CalculationResult> CalculateCapitalGainLossAsync(IFormFile file);
+    Task<List<CalculationResult>> CalculateCapitalGainLossAsync(List<IFormFile> files);
 }
