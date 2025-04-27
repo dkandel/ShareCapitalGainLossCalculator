@@ -11,12 +11,12 @@ public class CapitalGainLossCalculatorService : ICapitalGainLossCalculatorServic
 
     public async Task<List<CalculationResult>> CalculateCapitalGainLossAsync(List<IFormFile> files)
     {
-        var groupedTransactions = await ParseCsvFilesAsync(files);
-        var results = CalculateResults(groupedTransactions);
+        var groupedTransactions = await ParseTransactionsFromCsvAsync(files);
+        var results = CalculateCapitalGainLossResults(groupedTransactions);
         return results;
     }
     
-    private static async Task<List<IGrouping<string, Transaction>>> ParseCsvFilesAsync(List<IFormFile> files)
+    private static async Task<List<IGrouping<string, Transaction>>> ParseTransactionsFromCsvAsync(List<IFormFile> files)
     {
         try
         {
@@ -46,7 +46,7 @@ public class CapitalGainLossCalculatorService : ICapitalGainLossCalculatorServic
         }
     }
 
-    private List<CalculationResult> CalculateResults(IEnumerable<IGrouping<string, Transaction>> groupedTransactions)
+    private List<CalculationResult> CalculateCapitalGainLossResults(IEnumerable<IGrouping<string, Transaction>> groupedTransactions)
     {
         var results = new List<CalculationResult>();
         // if there are no sells, we can ignore those transactions as there is no loss or gain without a sell transaction.
@@ -75,6 +75,7 @@ public class CapitalGainLossCalculatorService : ICapitalGainLossCalculatorServic
                             Brokerage = transaction.BrokerageWithGst,
                             // initially remaining quantity will be the actual quantity of the buy transaction
                             RemainingQuantity = transaction.Quantity,
+                            OriginalQuantity = transaction.Quantity,
                             UnitPrice = transaction.UnitPrice
                         });
                         break;
@@ -85,7 +86,6 @@ public class CapitalGainLossCalculatorService : ICapitalGainLossCalculatorServic
                             var (gain, loss) = ProcessSell(transaction);
                             calculationResult.Gains += gain;
                             calculationResult.Losses += loss;
-                            calculationResult.IsGain = calculationResult.Gains > calculationResult.Losses;
                         }
 
                         break;
@@ -124,7 +124,7 @@ public class CapitalGainLossCalculatorService : ICapitalGainLossCalculatorServic
                     priceDifference *= 0.5m; // Apply 50% CGT discount
                 }
 
-                gain += priceDifference;
+                gain += Math.Round(priceDifference, 2);
             }
             else
             {
@@ -150,7 +150,7 @@ public class CapitalGainLossCalculatorService : ICapitalGainLossCalculatorServic
     private static decimal GetPurchasePrice(int sellQuantity, Holding holding)
     {
         var purchaseCost = sellQuantity * holding.UnitPrice;
-        var purchaseBrokerageProportion = Math.Round(holding.Brokerage * (sellQuantity / (decimal) holding.RemainingQuantity), 2);
+        var purchaseBrokerageProportion = Math.Round(holding.Brokerage * (sellQuantity / (decimal) holding.OriginalQuantity), 2);
         var costBase = purchaseCost + purchaseBrokerageProportion;
         return costBase;
     }

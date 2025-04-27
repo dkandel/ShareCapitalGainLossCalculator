@@ -7,12 +7,16 @@ namespace ShareCapitalGainLossCalculator.Models;
 public class CalculationResult
 {
     public string Code { get; set; }
+
     // The total amount of gains from transactions
     public decimal Gains { get; set; }
 
     // The total amount of losses from transactions
     public decimal Losses { get; set; }
 
+    public decimal NetGain => Gains > Losses ? Gains - Losses : 0m;
+    public decimal NetLoss => Losses > Gains ? Losses - Gains : 0m;
+
     // Indicates whether the result is a net gain (true if NetGain > 0)
-    public bool IsGain { get; set; }
+    public bool IsGain => NetGain > NetLoss;
 }

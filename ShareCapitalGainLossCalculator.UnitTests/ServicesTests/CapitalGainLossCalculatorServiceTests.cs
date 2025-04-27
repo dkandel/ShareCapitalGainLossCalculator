@@ -111,6 +111,48 @@ public class CapitalGainLossCalculatorServiceTests
     }
     
     [Fact]
+    public async Task CalculateCapitalGainLossAsync_WhenMultipleSells_ReturnsCorrectGain()
+    {
+        // Arrange
+        const string csvContent = """
+                                  Code,Company,Date,Type,Quantity,Unit Price ($),Trade Value ($),Brokerage+GST ($),GST ($),Contract Note,Total Value ($)
+                                  BHP,BHP Group,01/01/2023,Buy,100,10,1000,10,0,CN1,1010
+                                  BHP,BHP Group,01/02/2024,Sell,-50,12,600,10,0,CN2,590
+                                  BHP,BHP Group,01/03/2024,Sell,-30,11,330,10,0,CN3,320
+                                  BHP,BHP Group,01/04/2024,Sell,-20,9,180,10,0,CN4,170
+                                  """;
+        var mockFile = CreateMockIFormFile(csvContent, "transactions.csv");
+
+        // Act
+        var results = await _capitalGainLossCalculatorService.CalculateCapitalGainLossAsync([mockFile]);
+        var result = results.Single();
+        
+        Assert.Equal(19m, result.NetGain);
+        Assert.Equal(0m, result.NetLoss);
+    }
+    
+    [Fact]
+    public async Task CalculateCapitalGainLossAsync_WhenMultipleSells_ReturnsCorrectLoss()
+    {
+        // Arrange
+        const string csvContent = """
+                                  Code,Company,Date,Type,Quantity,Unit Price ($),Trade Value ($),Brokerage+GST ($),GST ($),Contract Note,Total Value ($)
+                                  BHP,BHP Group,01/01/2023,Buy,100,10,1000,10,0,CN1,1010
+                                  BHP,BHP Group,01/02/2024,Sell,-50,9,600,10,0,CN2,590
+                                  BHP,BHP Group,01/03/2024,Sell,-30,10,330,10,0,CN3,320
+                                  BHP,BHP Group,01/04/2024,Sell,-20,12,180,10,0,CN4,170
+                                  """;
+        var mockFile = CreateMockIFormFile(csvContent, "transactions.csv");
+
+        // Act
+        var results = await _capitalGainLossCalculatorService.CalculateCapitalGainLossAsync([mockFile]);
+        var result = results.Single();
+        
+        Assert.Equal(64m, result.NetLoss);
+        Assert.Equal(0, result.NetGain);
+    }
+    
+    [Fact]
     public async Task CalculateCapitalGainLossAsync_WhenSellAtGain_ReturnsIsGainAsTrue()
     {
         // Arrange
@@ -147,7 +189,7 @@ public class CapitalGainLossCalculatorServiceTests
         // FIFO: First 50 shares at $10, next 25 shares at $12
         // First 50: Sell Price 743.33, Purchase Price 505, Gain 50% of 238.33 (CGT Discount)
         // Next 25: Sell Price 371.67, Purchase Price 302.5, Gain 69.17 (No CGT Discount)
-        Assert.Equal(188.335m, result.Gains);
+        Assert.Equal(188.33m, result.Gains);
         Assert.Equal(0, result.Losses);
     }
     

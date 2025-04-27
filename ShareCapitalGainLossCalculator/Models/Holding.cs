@@ -6,4 +6,5 @@ public class Holding
     public decimal UnitPrice { get; init; }
     public DateTime PurchaseDate { get; init; }
     public decimal Brokerage { get; init; }
+    public int OriginalQuantity { get; set; }
 }
