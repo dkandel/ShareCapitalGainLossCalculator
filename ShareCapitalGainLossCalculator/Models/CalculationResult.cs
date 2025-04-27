@@ -14,5 +14,5 @@ public class CalculationResult
     public decimal Losses { get; set; }
 
     // Indicates whether the result is a net gain (true if NetGain > 0)
-    public decimal IsGain { get; set; }
+    public bool IsGain { get; set; }
 }

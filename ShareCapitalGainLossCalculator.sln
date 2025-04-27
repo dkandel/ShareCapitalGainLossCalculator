@@ -2,6 +2,12 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShareCapitalGainLossCalculator", "ShareCapitalGainLossCalculator\ShareCapitalGainLossCalculator.csproj", "{09FF4989-8088-4463-A908-21A6FA07B0B8}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "app", "app", "{BFC53D10-F788-4F60-BEB2-D388D9FC8770}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{EF129128-9FE1-4CBA-972C-2A2A1474DABB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShareCapitalGainLossCalculator.UnitTests", "ShareCapitalGainLossCalculator.UnitTests\ShareCapitalGainLossCalculator.UnitTests.csproj", "{48BABA37-D5DC-48D8-9F83-210F3E297948}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +18,13 @@ Global
 		{09FF4989-8088-4463-A908-21A6FA07B0B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{09FF4989-8088-4463-A908-21A6FA07B0B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{09FF4989-8088-4463-A908-21A6FA07B0B8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{48BABA37-D5DC-48D8-9F83-210F3E297948}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{48BABA37-D5DC-48D8-9F83-210F3E297948}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{48BABA37-D5DC-48D8-9F83-210F3E297948}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{48BABA37-D5DC-48D8-9F83-210F3E297948}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{09FF4989-8088-4463-A908-21A6FA07B0B8} = {BFC53D10-F788-4F60-BEB2-D388D9FC8770}
+		{48BABA37-D5DC-48D8-9F83-210F3E297948} = {EF129128-9FE1-4CBA-972C-2A2A1474DABB}
 	EndGlobalSection
 EndGlobal
