@@ -84,7 +84,8 @@ public class CapitalGainLossCalculatorService : ICapitalGainLossCalculatorServic
                         {
                             var (gain, loss) = ProcessSell(transaction);
                             calculationResult.Gains += gain;
-                            calculationResult.Losses -= loss;
+                            calculationResult.Losses += loss;
+                            calculationResult.IsGain = calculationResult.Gains > calculationResult.Losses;
                         }
 
                         break;
@@ -94,12 +95,7 @@ public class CapitalGainLossCalculatorService : ICapitalGainLossCalculatorServic
                 }
             }
 
-            if (calculationResult != null)
-            {
-                results.Add(calculationResult);
-            }
-
-            ;
+            results.Add(calculationResult);
         }
 
         return results;
@@ -108,39 +104,31 @@ public class CapitalGainLossCalculatorService : ICapitalGainLossCalculatorServic
     private (decimal Gain, decimal Loss) ProcessSell(Transaction sellTransaction)
     {
         var holdingsQueue = _holdings[sellTransaction.Code];
-        var quantityToSell = -sellTransaction.Quantity;
-        var saleProceedsPerShare = sellTransaction.UnitPrice;
-        var saleBrokerage = sellTransaction.BrokerageWithGst;
+        var quantityToSell = Math.Abs(sellTransaction.Quantity);
+        
         decimal gain = 0, loss = 0;
         while (quantityToSell > 0 && holdingsQueue.Count != 0)
         {
             var holding = holdingsQueue.Peek();
             var sellQuantity = Math.Min(quantityToSell, holding.RemainingQuantity);
 
-            var purchaseCost = sellQuantity * holding.UnitPrice;
-            var purchaseBrokerageProportion = holding.Brokerage * (sellQuantity / (decimal) holding.RemainingQuantity);
-
-            var saleProceeds = sellQuantity * saleProceedsPerShare;
-            var saleBrokerageProportion = saleBrokerage * (sellQuantity / (decimal) sellTransaction.Quantity);
-
-            var costBase = purchaseCost + purchaseBrokerageProportion;
-            var capitalProceeds = saleProceeds - saleBrokerageProportion;
-            var gainOrLoss = capitalProceeds - costBase;
-
-            var eligibleForCgtDiscount = (sellTransaction.Date - holding.PurchaseDate).TotalDays > 365;
-
-            if (gainOrLoss > 0)
+            var purchasePrice = GetPurchasePrice(sellQuantity, holding);
+            var sellPrice = GetSellPrice(sellQuantity, sellTransaction);
+            var priceDifference = sellPrice - purchasePrice;
+            
+            if (priceDifference > 0)
             {
+                var eligibleForCgtDiscount = (sellTransaction.Date - holding.PurchaseDate).TotalDays > 365;
                 if (eligibleForCgtDiscount)
                 {
-                    gainOrLoss *= 0.5m; // Apply 50% CGT discount
+                    priceDifference *= 0.5m; // Apply 50% CGT discount
                 }
 
-                gain = gainOrLoss;
+                gain += priceDifference;
             }
             else
             {
-                loss = Math.Abs(gainOrLoss);
+                loss += Math.Abs(priceDifference);
             }
 
             holding.RemainingQuantity -= sellQuantity;
@@ -149,9 +137,29 @@ public class CapitalGainLossCalculatorService : ICapitalGainLossCalculatorServic
             if (holding.RemainingQuantity == 0)
             {
                 holdingsQueue.Dequeue(); // Remove holding if fully sold
+                if (holdingsQueue.Count == 0 && quantityToSell > 0)
+                {
+                    throw new InvalidDataException("There are no holdings to sell.");
+                }
             }
         }
 
         return (gain, loss);
+    }
+    
+    private static decimal GetPurchasePrice(int sellQuantity, Holding holding)
+    {
+        var purchaseCost = sellQuantity * holding.UnitPrice;
+        var purchaseBrokerageProportion = Math.Round(holding.Brokerage * (sellQuantity / (decimal) holding.RemainingQuantity), 2);
+        var costBase = purchaseCost + purchaseBrokerageProportion;
+        return costBase;
+    }
+    
+    private static decimal GetSellPrice(int sellQuantity, Transaction sellTransaction)
+    {
+        var saleProceeds = sellQuantity * sellTransaction.UnitPrice;
+        var saleBrokerageProportion = Math.Round(sellTransaction.BrokerageWithGst * (sellQuantity / (decimal) Math.Abs(sellTransaction.Quantity)), 2);
+        var sellPrice = saleProceeds - saleBrokerageProportion;
+        return sellPrice;
     }
 }
